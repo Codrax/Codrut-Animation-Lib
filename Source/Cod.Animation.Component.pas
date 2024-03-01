@@ -12,7 +12,8 @@ uses
   type
     // Cardinals
     TAnimationStatus = (Stopped, Running, Paused);
-    TAnimationKind = (Linear, Exponential, ReverseExpo, Random, Spring, Sinus, Pulse);
+    TAnimationKind = (Linear, Exponential, ReverseExpo, Random, Spring, Sinus,
+      SinusArc, Wobbly, Pulse);
 
     // Notify Event
     TAniStepEvent = procedure(Sender: TObject; Step, TotalSteps: integer) of object;
@@ -518,13 +519,15 @@ begin
       else
         FCurrentValue := AStart - D + ASign * trunc( Power(abs(D), 1-FStepValue / X) );
     end;
-    TAnimationKind.Sinus: begin
+    TAnimationKind.Sinus: FCurrentValue := AStart + trunc(sin(((FStepValue / FTotalStep)/2)*pi) * ADelta);
+    TAnimationKind.SinusArc: begin
       x := FStepValue / FTotalStep;
       if x <= 0.5 then
         FCurrentValue := AStart + trunc(sin(x*pi)/2 * ADelta)
       else
         FCurrentValue := AStart + trunc((sin((x+1)*pi)/2+1) * ADelta);
     end;
+    TAnimationKind.Wobbly: FCurrentValue := AStart + trunc(sin(((FStepValue / FTotalStep)*2)*pi) * ADelta);
 
     // Non END value animations
     TAnimationKind.Pulse: FCurrentValue := AStart + trunc(sin((FStepValue / FTotalStep)*pi)/2 * ADelta);
@@ -594,13 +597,15 @@ begin
       else
         FCurrentValue := AStart - D + ASign *  Power(abs(D), 1-FStepValue / X);
     end;
-    TAnimationKind.Sinus: begin
+    TAnimationKind.Sinus: FCurrentValue := AStart + sin(((FStepValue / FTotalStep)/2)*pi) * ADelta;
+    TAnimationKind.SinusArc: begin
       x := FStepValue / FTotalStep;
       if x <= 0.5 then
         FCurrentValue := AStart + sin(x*pi)/2 * ADelta
       else
         FCurrentValue := AStart + (sin((x+1)*pi)/2+1) * ADelta;
     end;
+    TAnimationKind.Wobbly: FCurrentValue := AStart + sin(((FStepValue / FTotalStep)*2)*pi) * ADelta;
 
     // Non END value animations
     TAnimationKind.Pulse: FCurrentValue := AStart + sin((FStepValue / FTotalStep)*pi)/2 * ADelta;
