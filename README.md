@@ -36,6 +36,16 @@ You may also pause the animation using the `Paused property`
 | StartValue | {AnimationType} | The value from which the animation starts. Can be overriden by `StartFromCurrent` |
 | Steps | Integer | Set a custom steps value for the animation, instead of auto-calculating them. The less steps the greater the drawing performance |
 
+## Animation types
+- Linear
+- Exponential
+- Pulse
+- Random
+- ReverseExpo
+- Sinus
+- Spring
+
+Note: `Pulse` does not reach It's end value, as It pulses to the Value, but returns back.
 
 ## Use without component
 1) Assign the OnStep notify event from the Object Inspector.
