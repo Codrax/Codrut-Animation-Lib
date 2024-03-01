@@ -15,7 +15,7 @@ You can also use as many sub-classes as you wish. Like `Button1.Margin.Interior.
 ## Start / stop animation
 You can change the `Running` property, or use the `Start` or `Stop` procedures.
 
-You may also pause the animation using the `Paused property`
+You may also pause the animation using the `Paused` property.
 
 ## Properties
 | Property  | Type | Description |
