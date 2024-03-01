@@ -43,10 +43,11 @@ You may also pause the animation using the `Paused property`
 - Random
 - ReverseExpo
 - Sinus
-- SinusArc
+- SinusAr
+- Wobblyc
 - Spring
 
-Note: `Pulse` does not reach It's end value, as It pulses to the Value, but returns back.
+Note: `Pulse` and `Wobbly` do not reach their end value, as they return back to their start value.
 
 ## Use without component
 1) Assign the OnStep notify event from the Object Inspector.
