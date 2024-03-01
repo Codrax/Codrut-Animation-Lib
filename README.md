@@ -43,6 +43,7 @@ You may also pause the animation using the `Paused property`
 - Random
 - ReverseExpo
 - Sinus
+- SinusArc
 - Spring
 
 Note: `Pulse` does not reach It's end value, as It pulses to the Value, but returns back.
