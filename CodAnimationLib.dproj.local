@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/09/15 17:59:10.000.715,=rtl.dcp</Transaction>
+    <Transaction>2023/09/15 17:59:47.000.105,F:\Development\Delphi\Components\Codruts Animation Library\CodAnimationLib.dproj=F:\Development\Delphi\Current\Package1.dproj</Transaction>
+    <Transaction>2023/09/15 17:59:56.000.473,=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2023/09/15 18:00:08.000.140,F:\Development\Delphi\Components\Codruts Animation Library\Source\Cod.Animation.Utils.pas=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2023/09/15 18:02:32.000.213,=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2023/09/15 18:02:41.000.198,F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas=F:\Development\Delphi\Components\Codruts Animation Library\Source\Cod.Animation.Register.pas</Transaction>
+    <Transaction>2023/09/15 18:03:34.000.044,=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2023/09/15 18:04:16.000.692,F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas=F:\Development\Delphi\Components\Codruts Animation Library\Source\Cod.Animation.Component.pas</Transaction>
+    <Transaction>2023/09/15 18:06:19.000.628,=vcl.dcp</Transaction>
+    <Transaction>2023/09/15 18:20:03.000.286,=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2023/09/15 18:20:14.000.808,F:\Development\Delphi\Components\Codruts Animation Library\Source\Cod.Animation.PropertyEditor.pas=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2024/03/01 10:56:15.000.075,=F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas</Transaction>
+    <Transaction>2024/03/01 10:56:25.000.623,F:\Development\Delphi\Components\Codruts Animation Library\Unit1.pas=F:\Development\Delphi\Components\Codruts Animation Library\Source\Cod.Animation.PropEditDefine.pas</Transaction>
+  </Transactions>
+</BorlandProject>
