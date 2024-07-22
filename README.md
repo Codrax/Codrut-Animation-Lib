@@ -57,7 +57,7 @@ with TAsyncIntAnim.Create do
       StartValue := Screen.DesktopRect.Left;
       EndValue := Screen.DesktopRect.Right-Self.Width;
 
-      Duration := 1; // seconds
+      Duration := 1.00; // seconds
       Kind := TAnimationKind.ReverseExpo;
 
       // Events
