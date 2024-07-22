@@ -19,7 +19,7 @@ interface
 
     type
       // Percent Property
-      TFXIntegerAnimProperty = class(TPropertyEditorAnimationDeclaration)
+      TFXIntegerAnimProperty = class(TPropertyEditorExtended)
       private
       public
         function GetAttributes: TPropertyAttributes; override;

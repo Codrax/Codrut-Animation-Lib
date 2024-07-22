@@ -19,7 +19,7 @@ interface
   ToolsAPI, DesignEditors;
 
   type
-  TPropertyEditorAnimationDeclaration = class(TBasePropertyEditor, IProperty, IPropertyKind, IProperty70)
+  TPropertyEditorExtended = class(TBasePropertyEditor, IProperty, IPropertyKind, IProperty70)
   private
     FDesigner: IDesigner;
     FPropList: PInstPropList;
@@ -134,7 +134,7 @@ end;
 
 { TPropertyEditor }
 
-constructor TPropertyEditorAnimationDeclaration.Create(const ADesigner: IDesigner;
+constructor TPropertyEditorExtended.Create(const ADesigner: IDesigner;
   APropCount: Integer);
 begin
   inherited Create(ADesigner, APropCount);
@@ -143,23 +143,23 @@ begin
   FPropCount := APropCount;
 end;
 
-destructor TPropertyEditorAnimationDeclaration.Destroy;
+destructor TPropertyEditorExtended.Destroy;
 begin
   if FPropList <> nil then
     FreeMem(FPropList, FPropCount * SizeOf(TInstProp));
   inherited Destroy;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.Activate;
+procedure TPropertyEditorExtended.Activate;
 begin
 end;
 
-function TPropertyEditorAnimationDeclaration.AllEqual: Boolean;
+function TPropertyEditorExtended.AllEqual: Boolean;
 begin
   Result := FPropCount = 1;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.Edit;
+procedure TPropertyEditorExtended.Edit;
 type
   TGetStrFunc = function(const Value: string): Integer of object;
 var
@@ -184,125 +184,125 @@ begin
   end;
 end;
 
-function TPropertyEditorAnimationDeclaration.AutoFill: Boolean;
+function TPropertyEditorExtended.AutoFill: Boolean;
 begin
   Result := Assigned(GetPropInfo^.SetProc);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetAttributes: TPropertyAttributes;
+function TPropertyEditorExtended.GetAttributes: TPropertyAttributes;
 begin
   Result := [paMultiSelect, paRevertable];
   if FPropList[0].PropInfo.SetProc = nil then
     Result := Result + [paReadOnly, paDisplayReadOnly];
 end;
 
-function TPropertyEditorAnimationDeclaration.GetComponent(Index: Integer): TPersistent;
+function TPropertyEditorExtended.GetComponent(Index: Integer): TPersistent;
 begin
   Result := FPropList^[Index].Instance;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetFloatValue: Extended;
+function TPropertyEditorExtended.GetFloatValue: Extended;
 begin
   Result := GetFloatValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetFloatValueAt(Index: Integer): Extended;
+function TPropertyEditorExtended.GetFloatValueAt(Index: Integer): Extended;
 begin
   with FPropList^[Index] do Result := GetFloatProp(Instance, PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetMethodValue: TMethod;
+function TPropertyEditorExtended.GetMethodValue: TMethod;
 begin
   Result := GetMethodValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetMethodValueAt(Index: Integer): TMethod;
+function TPropertyEditorExtended.GetMethodValueAt(Index: Integer): TMethod;
 begin
   with FPropList^[Index] do Result := GetMethodProp(Instance, PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetEditLimit: Integer;
+function TPropertyEditorExtended.GetEditLimit: Integer;
 begin
   Result := 2047;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetName: string;
+function TPropertyEditorExtended.GetName: string;
 begin
   Result := GetPropName(FPropList^[0].PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetOrdValue: Longint;
+function TPropertyEditorExtended.GetOrdValue: Longint;
 begin
   Result := GetOrdValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetOrdValueAt(Index: Integer): Longint;
+function TPropertyEditorExtended.GetOrdValueAt(Index: Integer): Longint;
 begin
   with FPropList^[Index] do Result := GetOrdProp(Instance, PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetPrivateDirectory: string;
+function TPropertyEditorExtended.GetPrivateDirectory: string;
 begin
   Result := '';
   if Designer <> nil then
     Result := Designer.GetPrivateDirectory;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.GetProperties(Proc: TGetPropProc);
+procedure TPropertyEditorExtended.GetProperties(Proc: TGetPropProc);
 begin
 end;
 
-function TPropertyEditorAnimationDeclaration.GetPropInfo: PPropInfo;
+function TPropertyEditorExtended.GetPropInfo: PPropInfo;
 begin
   Result := FPropList^[0].PropInfo;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetPropType: PTypeInfo;
+function TPropertyEditorExtended.GetPropType: PTypeInfo;
 begin
   Result := FPropList^[0].PropInfo^.PropType^;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetStrValue: string;
+function TPropertyEditorExtended.GetStrValue: string;
 begin
   Result := GetStrValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetStrValueAt(Index: Integer): string;
+function TPropertyEditorExtended.GetStrValueAt(Index: Integer): string;
 begin
   with FPropList^[Index] do Result := GetStrProp(Instance, PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetWideStrValue: WideString;
+function TPropertyEditorExtended.GetWideStrValue: WideString;
 begin
   Result := GetWideStrValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetWideStrValueAt(Index: Integer): WideString;
+function TPropertyEditorExtended.GetWideStrValueAt(Index: Integer): WideString;
 begin
   with FPropList^[Index] do Result := GetWideStrProp(Instance, PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetVarValue: Variant;
+function TPropertyEditorExtended.GetVarValue: Variant;
 begin
   Result := GetVarValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetVarValueAt(Index: Integer): Variant;
+function TPropertyEditorExtended.GetVarValueAt(Index: Integer): Variant;
 begin
   with FPropList^[Index] do Result := GetVariantProp(Instance, PropInfo);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetValue: string;
+function TPropertyEditorExtended.GetValue: string;
 begin
   Result := srUnknown;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetValueW: WideString;
+function TPropertyEditorExtended.GetValueW: WideString;
 begin
   Result := srUnknown;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetVisualValue: string;
+function TPropertyEditorExtended.GetVisualValue: string;
 begin
   if AllEqual then
     Result := GetValue
@@ -310,21 +310,21 @@ begin
     Result := '';
 end;
 
-procedure TPropertyEditorAnimationDeclaration.GetValues(Proc: TGetStrProc);
+procedure TPropertyEditorExtended.GetValues(Proc: TGetStrProc);
 begin
 end;
 
-procedure TPropertyEditorAnimationDeclaration.Initialize;
+procedure TPropertyEditorExtended.Initialize;
 begin
 end;
 
-procedure TPropertyEditorAnimationDeclaration.Modified;
+procedure TPropertyEditorExtended.Modified;
 begin
   if Designer <> nil then
     Designer.Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetFloatValue(Value: Extended);
+procedure TPropertyEditorExtended.SetFloatValue(Value: Extended);
 var
   I: Integer;
 begin
@@ -333,7 +333,7 @@ begin
   Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetMethodValue(const Value: TMethod);
+procedure TPropertyEditorExtended.SetMethodValue(const Value: TMethod);
 var
   I: Integer;
 begin
@@ -342,7 +342,7 @@ begin
   Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetOrdValue(Value: Longint);
+procedure TPropertyEditorExtended.SetOrdValue(Value: Longint);
 var
   I: Integer;
 begin
@@ -351,7 +351,7 @@ begin
   Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetPropEntry(Index: Integer;
+procedure TPropertyEditorExtended.SetPropEntry(Index: Integer;
   AInstance: TPersistent; APropInfo: PPropInfo);
 begin
   with FPropList^[Index] do
@@ -361,7 +361,7 @@ begin
   end;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetStrValue(const Value: string);
+procedure TPropertyEditorExtended.SetStrValue(const Value: string);
 var
   I: Integer;
 begin
@@ -372,7 +372,7 @@ begin
   Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetWideStrValue(const Value: WideString);
+procedure TPropertyEditorExtended.SetWideStrValue(const Value: WideString);
 var
   I: Integer;
 begin
@@ -383,7 +383,7 @@ begin
   Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetVarValue(const Value: Variant);
+procedure TPropertyEditorExtended.SetVarValue(const Value: Variant);
 var
   I: Integer;
 begin
@@ -392,7 +392,7 @@ begin
   Modified;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.Revert;
+procedure TPropertyEditorExtended.Revert;
 var
   I: Integer;
 begin
@@ -401,15 +401,15 @@ begin
       with FPropList^[I] do Designer.Revert(Instance, PropInfo);
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetValue(const Value: string);
+procedure TPropertyEditorExtended.SetValue(const Value: string);
 begin
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetValue(const Value: WideString);
+procedure TPropertyEditorExtended.SetValue(const Value: WideString);
 begin
 end;
 
-function TPropertyEditorAnimationDeclaration.ValueAvailable: Boolean;
+function TPropertyEditorExtended.ValueAvailable: Boolean;
 var
   I: Integer;
   S: string;
@@ -431,17 +431,17 @@ begin
   end;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetInt64Value: Int64;
+function TPropertyEditorExtended.GetInt64Value: Int64;
 begin
   Result := GetInt64ValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetInt64ValueAt(Index: Integer): Int64;
+function TPropertyEditorExtended.GetInt64ValueAt(Index: Integer): Int64;
 begin
   with FPropList^[Index] do Result := GetInt64Prop(Instance, PropInfo);
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetInt64Value(Value: Int64);
+procedure TPropertyEditorExtended.SetInt64Value(Value: Int64);
 var
   I: Integer;
 begin
@@ -450,17 +450,17 @@ begin
   Modified;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetIntfValue: IInterface;
+function TPropertyEditorExtended.GetIntfValue: IInterface;
 begin
   Result := GetIntfValueAt(0);
 end;
 
-function TPropertyEditorAnimationDeclaration.GetIntfValueAt(Index: Integer): IInterface;
+function TPropertyEditorExtended.GetIntfValueAt(Index: Integer): IInterface;
 begin
   with FPropList^[Index] do Result := GetInterfaceProp(Instance, PropInfo);
 end;
 
-procedure TPropertyEditorAnimationDeclaration.SetIntfValue(const Value: IInterface);
+procedure TPropertyEditorExtended.SetIntfValue(const Value: IInterface);
 var
   I: Integer;
 begin
@@ -469,7 +469,7 @@ begin
   Modified;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetEditValue(out Value: string): Boolean;
+function TPropertyEditorExtended.GetEditValue(out Value: string): Boolean;
 var
   PropInfo: PPropInfo;
 begin
@@ -484,7 +484,7 @@ begin
   end;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetEditValue(out Value: WideString): Boolean;
+function TPropertyEditorExtended.GetEditValue(out Value: WideString): Boolean;
 var
   PropInfo: PPropInfo;
 begin
@@ -499,7 +499,7 @@ begin
   end;
 end;
 
-function TPropertyEditorAnimationDeclaration.HasInstance(Instance: TPersistent): Boolean;
+function TPropertyEditorExtended.HasInstance(Instance: TPersistent): Boolean;
 var
   I: Integer;
 begin
@@ -512,7 +512,7 @@ end;
 type
   TComponentHack = class(TComponent);
 
-procedure TPropertyEditorAnimationDeclaration.WriteComponentSimulation(Component: TComponent);
+procedure TPropertyEditorExtended.WriteComponentSimulation(Component: TComponent);
   function FindAncestor(const Name: string): TComponent;
   var
     I: Integer;
@@ -615,7 +615,7 @@ begin
   end;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetIsDefault: Boolean;
+function TPropertyEditorExtended.GetIsDefault: Boolean;
   function CheckProperties(AnObject: TObject): Boolean;
   var
     PropList: PPropList;
@@ -762,12 +762,12 @@ begin
   end;
 end;
 
-procedure TPropertyEditorAnimationDeclaration.AddAncestor(Component: TComponent);
+procedure TPropertyEditorExtended.AddAncestor(Component: TComponent);
 begin
   FAncestorList.Add(Component);
 end;
 
-procedure TPropertyEditorAnimationDeclaration.GetLookupInfo(var Ancestor: TPersistent;
+procedure TPropertyEditorExtended.GetLookupInfo(var Ancestor: TPersistent;
   var Root, LookupRoot, RootAncestor: TComponent);
 begin
   Ancestor := FAncestor;
@@ -776,7 +776,7 @@ begin
   RootAncestor := FRootAncestor;
 end;
 
-function TPropertyEditorAnimationDeclaration.GetKind: TTypeKind;
+function TPropertyEditorExtended.GetKind: TTypeKind;
 begin
   Result := GetPropType.Kind;
 end;
