@@ -1,3 +1,15 @@
+(**************************************************************)
+(*                 Codrut's Animation Library                 *)
+(*                                                            *)
+(*                                                            *)
+(*                    Copyright (c) 2024                      *)
+(*             Petculescu Codrut. Codrut Software             *)
+(*                                                            *)
+(*                https://www.codrutsoft.com/                 *)
+(*       https://github.com/Codrax/Codrut-Animation-Lib/      *)
+(*                                                            *)
+(**************************************************************)
+
 unit Cod.Animation.PropertyEditor;
 
 interface
@@ -19,7 +31,7 @@ interface
 
     type
       // Percent Property
-      TFXIntegerAnimProperty = class(TPropertyEditorExtended)
+      TFXIntegerAnimProperty = class(TPropertyEditorAnimExtended)
       private
       public
         function GetAttributes: TPropertyAttributes; override;
