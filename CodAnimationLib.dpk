@@ -36,10 +36,12 @@ requires
 contains
   Cod.Animation.Utils in 'Source\Cod.Animation.Utils.pas',
   Cod.Animation.Register in 'Source\Cod.Animation.Register.pas',
+  Cod.Animation.Main in 'Source\Cod.Animation.Main.pas',
   Cod.Animation.Component in 'Source\Cod.Animation.Component.pas',
   Cod.Animation.PropertyEditor in 'Source\Cod.Animation.PropertyEditor.pas',
   Cod.Animation.PropEditDefine in 'Source\Cod.Animation.PropEditDefine.pas';
 
 end.
+
 
 

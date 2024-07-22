@@ -134,6 +134,7 @@
         <DCCReference Include="DesignIDE.dcp"/>
         <DCCReference Include="Source\Cod.Animation.Utils.pas"/>
         <DCCReference Include="Source\Cod.Animation.Register.pas"/>
+        <DCCReference Include="Source\Cod.Animation.Main.pas"/>
         <DCCReference Include="Source\Cod.Animation.Component.pas"/>
         <DCCReference Include="Source\Cod.Animation.PropertyEditor.pas"/>
         <DCCReference Include="Source\Cod.Animation.PropEditDefine.pas"/>

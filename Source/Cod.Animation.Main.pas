@@ -105,7 +105,7 @@ uses
       procedure ExecuteAnimation; override;
       procedure DoStepValue; override;
 
-    published
+    public
       // Properties
       property StartValue: integer read FStartValue write FStartValue;
       property EndValue: integer read FEndValue write FEndValue;
@@ -132,7 +132,7 @@ uses
       procedure ExecuteAnimation; override;
       procedure DoStepValue; override;
 
-    published
+    public
       // Properties
       property StartValue: real read FStartValue write FStartValue;
       property EndValue: real read FEndValue write FEndValue;
@@ -271,7 +271,7 @@ end;
 
 function TAsyncAnim.GetRunning: boolean;
 begin
-
+  Result := FStatus = TAnimationStatus.Running;
 end;
 
 procedure TAsyncAnim.SetDuration(const Value: single);
