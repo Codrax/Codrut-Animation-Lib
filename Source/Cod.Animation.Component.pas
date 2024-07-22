@@ -1,20 +1,13 @@
 unit Cod.Animation.Component;
 
-{$SCOPEDENUMS ON}
-
 interface
 
 uses
     Windows, Messages, SysUtils, Variants, Classes,
     Vcl.Controls, Vcl.Dialogs, System.Math, TypInfo,
-    Cod.Animation.Utils;
+    Cod.Animation.Main, Cod.Animation.Utils;
 
   type
-    // Cardinals
-    TAnimationStatus = (Stopped, Running, Paused);
-    TAnimationKind = (Linear, Exponential, ReverseExpo, Random, Spring, Sinus,
-      SinusArc, Wobbly, Pulse);
-
     // Notify Event
     TAniStepEvent = procedure(Sender: TObject; Step, TotalSteps: integer) of object;
 
@@ -105,11 +98,11 @@ uses
       property Duration: single read FDuration write SetDuration;
 
       property Kind: TAnimationKind read FKind write FKind;
+      property Inverse: boolean read FInverse write FInverse default false;
 
       property Steps: integer read FSteps write SetSteps default 0;
 
       property StartFromCurrent: boolean read FStartFromCurrent write FStartFromCurrent default false;
-      property Inverse: boolean read FInverse write FInverse default false;
       property Loop: boolean read FLoop write FLoop default false;
       property LoopInverse: boolean read FLoopInverse write FLoopInverse default false;
       property DelayLoop: boolean read FDelayLoop write FDelayLoop default false;
@@ -292,12 +285,21 @@ begin
       Inc(FStepValue);
     end;
 
+  // Stopped
+  if FThread.CheckTerminated then
+    Exit;
+
   // Loop
   if Loop then
     begin
       if DelayLoop then
         WaitDelay;
 
+      // Stopped
+      if FThread.CheckTerminated then
+        Exit;
+
+      // Reset
       FStepValue := 0;
 
       if FLoopInverse then
@@ -449,7 +451,7 @@ begin
   if FStatus in [TAnimationStatus.Running, TAnimationStatus.Paused] then
     begin
       FThread.Terminate;
-      FThread.WaitFor;
+      //FThread.WaitFor;
 
       FStatus := TAnimationStatus.Stopped;
     end;
@@ -484,9 +486,7 @@ end;
 
 procedure TIntAnim.DoStepValue;
 var
-  AStart, ADelta, ASign: integer;
-  X: real;
-  D, T: integer;
+  AStart, ADelta: integer;
 begin
   inherited;
   // Inverse
@@ -501,37 +501,8 @@ begin
       ADelta := FDelta;
     end;
 
-  ASign := Sign(ADelta);
-
   // Calc
-  case Kind of
-    TAnimationKind.Linear: FCurrentValue := AStart + trunc(FStepValue / FTotalStep * ADelta);
-    TAnimationKind.Exponential: FCurrentValue := AStart + sign(ADelta) * trunc(Power(abs(ADelta), FStepValue / FTotalStep));
-    TAnimationKind.ReverseExpo: FCurrentValue := AStart + ADelta - sign(ADelta) * trunc(Power(abs(ADelta), 1-FStepValue / FTotalStep));
-    TAnimationKind.Random: FCurrentValue := AStart + trunc(RandomRange(0, FTotalStep+1) / FTotalStep * ADelta);
-    TAnimationKind.Spring: begin
-      X := FTotalStep / 5;
-      D := trunc(ADelta / 5);
-      T := (D+ADelta)*ASign;
-
-      if FStepValue >= X then
-        FCurrentValue := AStart - D + ASign * (T-trunc( Power(abs(T), 1-(FStepValue-X)/(FTotalStep-X)) ))
-      else
-        FCurrentValue := AStart - D + ASign * trunc( Power(abs(D), 1-FStepValue / X) );
-    end;
-    TAnimationKind.Sinus: FCurrentValue := AStart + trunc(sin(((FStepValue / FTotalStep)/2)*pi) * ADelta);
-    TAnimationKind.SinusArc: begin
-      x := FStepValue / FTotalStep;
-      if x <= 0.5 then
-        FCurrentValue := AStart + trunc(sin(x*pi)/2 * ADelta)
-      else
-        FCurrentValue := AStart + trunc((sin((x+1)*pi)/2+1) * ADelta);
-    end;
-    TAnimationKind.Wobbly: FCurrentValue := AStart + trunc(sin(((FStepValue / FTotalStep)*2)*pi) * ADelta);
-
-    // Non END value animations
-    TAnimationKind.Pulse: FCurrentValue := AStart + trunc(sin((FStepValue / FTotalStep)*pi)/2 * ADelta);
-  end;
+  FCurrentValue := AStart + trunc(CalculateAnimationValue(FKind, FStepValue, FTotalStep, ADelta));
 
   // Set
   if ComponentBased then
@@ -562,11 +533,9 @@ end;
 procedure TFloatAnim.DoStepValue;
 var
   AStart, ADelta: real;
-  ASign: integer;
-  X: real;
-  D, T: real;
 begin
   inherited;
+
   // Inverse
   if Inverse then
     begin
@@ -579,37 +548,8 @@ begin
       ADelta := FDelta;
     end;
 
-  ASign := Sign(ADelta);
-
   // Calc
-  case Kind of
-    TAnimationKind.Linear: FCurrentValue := AStart + FStepValue / FTotalStep * ADelta;
-    TAnimationKind.Exponential: FCurrentValue := AStart + sign(ADelta) * Power(abs(ADelta), FStepValue / FTotalStep);
-    TAnimationKind.ReverseExpo: FCurrentValue := AStart + ADelta - sign(ADelta) * Power(abs(ADelta), 1-FStepValue / FTotalStep);
-    TAnimationKind.Random: FCurrentValue := AStart + RandomRange(0, FTotalStep+1) / FTotalStep * ADelta;
-    TAnimationKind.Spring: begin
-      X := FTotalStep / 5;
-      D := ADelta / 5;
-      T := (D+ADelta)*ASign;
-
-      if FStepValue >= X then
-        FCurrentValue := AStart - D + ASign * T- Power(abs(T), 1-(FStepValue-X)/(FTotalStep-X))
-      else
-        FCurrentValue := AStart - D + ASign *  Power(abs(D), 1-FStepValue / X);
-    end;
-    TAnimationKind.Sinus: FCurrentValue := AStart + sin(((FStepValue / FTotalStep)/2)*pi) * ADelta;
-    TAnimationKind.SinusArc: begin
-      x := FStepValue / FTotalStep;
-      if x <= 0.5 then
-        FCurrentValue := AStart + sin(x*pi)/2 * ADelta
-      else
-        FCurrentValue := AStart + (sin((x+1)*pi)/2+1) * ADelta;
-    end;
-    TAnimationKind.Wobbly: FCurrentValue := AStart + sin(((FStepValue / FTotalStep)*2)*pi) * ADelta;
-
-    // Non END value animations
-    TAnimationKind.Pulse: FCurrentValue := AStart + sin((FStepValue / FTotalStep)*pi)/2 * ADelta;
-  end;
+  FCurrentValue := AStart + CalculateAnimationValue(FKind, FStepValue, FTotalStep, ADelta);
 
   // Set
   if ComponentBased then
