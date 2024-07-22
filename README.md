@@ -50,6 +50,7 @@ You may also pause the animation using the `Paused` property.
 Note: `Pulse` and `Wobbly` do not reach their end value, as they return back to their start value.
 
 ## Async animation example
+You can use Async animations with the TAsyncAnim class. These, unlike the standard `TIntAnim` and `TFloatAnim`, are not components so you can easily use them wherever you'd like In your code. They run in the thread that called them until they finalise.
 ```
 with TAsyncIntAnim.Create do
     try
