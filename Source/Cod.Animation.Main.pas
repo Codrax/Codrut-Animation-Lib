@@ -28,7 +28,7 @@ uses
     // Async animations
     TAsyncAnim = class
     private
-
+      FFreeOnFinish: boolean;
 
       // Data
       FDelay: single;
@@ -76,6 +76,7 @@ uses
       procedure Stop;
 
       // Properties
+      property FreeOnFinish: boolean read FFreeOnFinish write FFreeOnFinish;
       property Delay: single read FDelay write FDelay;
       property Duration: single read FDuration write SetDuration;
 
@@ -209,6 +210,8 @@ end;
 constructor TAsyncAnim.Create;
 begin
   // Defaults
+  FFreeOnFinish := false;
+
   FInverse := false;
   FStatus := TAnimationStatus.Stopped;
   FKind := TAnimationKind.Linear;
@@ -274,6 +277,10 @@ begin
   // Notify
   if Assigned(FOnFinish) then
     FOnFinish();
+
+  // Free?
+  if FFreeOnFinish  then
+    Self.Free;
 end;
 
 function TAsyncAnim.GetPaused: boolean;
