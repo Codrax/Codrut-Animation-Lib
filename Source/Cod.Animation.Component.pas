@@ -53,6 +53,7 @@ uses
       // Runtime
       FSteps: integer;
       FStatus: TAnimationStatus;
+      ComponentBased: boolean;
 
       // Latency
       FLatencyAdjust: boolean;
@@ -61,9 +62,10 @@ uses
       // Loop
       FLoop: boolean;
       FLoopInverse: boolean;
-      FDelayLoop: boolean;
+      FLoopDelay: boolean;
 
       // Property
+      FComponent: TComponent;
       FStartFromCurrent: boolean;
       FPropertyName: string;
 
@@ -75,9 +77,6 @@ uses
 
       // Thread
       FThread: TAnimationThread;
-      FComponent: TComponent;
-
-      ComponentBased: boolean;
 
       // Animation Tick
       FStepValue: integer;
@@ -123,15 +122,15 @@ uses
 
       property Steps: integer read FSteps write SetSteps default 0;
 
-      // compensate for the time needed to execute the code
+      { compensate for the time needed to execute the code }
       property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
-      // determine wheather in order to compensate, skipping steps is permitted
+      { determine wheather in order to compensate, skipping steps is permitted }
       property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
 
       property StartFromCurrent: boolean read FStartFromCurrent write FStartFromCurrent default false;
       property Loop: boolean read FLoop write FLoop default false;
       property LoopInverse: boolean read FLoopInverse write FLoopInverse default false;
-      property DelayLoop: boolean read FDelayLoop write FDelayLoop default false;
+      property LoopDelay: boolean read FLoopDelay write FLoopDelay default false;
 
       property PropertyName: string read FPropertyName write FPropertyName;
 
@@ -320,6 +319,10 @@ begin
             FOnStep(Self, FStepValue, FTotalStep);
           end);
 
+      // Stopped
+      if FThread.CheckTerminated then
+        Exit;
+
       // Sleep
       if (FStepValue < FTotalStep-1) and (FSleepStep > 0) then begin
         SleepTime := FSleepStep;
@@ -349,7 +352,7 @@ begin
   // Loop
   if Loop then
     begin
-      if DelayLoop then
+      if LoopDelay then
         WaitDelay;
 
       // Stopped

@@ -42,6 +42,7 @@ uses
       // Runtime
       FSteps: integer;
       FStatus: TAnimationStatus;
+      FCanceled: boolean;
 
       // Latency
       FLatencyAdjust: boolean;
@@ -56,8 +57,6 @@ uses
       FStepValue: integer;
       FTotalStep: integer;
       FSleepStep: integer;
-
-      FCanceled: boolean;
 
       // System
       procedure WaitDelay;
@@ -94,9 +93,9 @@ uses
 
       property Steps: integer read FSteps write SetSteps;
 
-      // compensate for the time needed to execute the code
+      { compensate for the time needed to execute the code }
       property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
-      // determine wheather in order to compensate, skipping steps is permitted
+      { determine wheather in order to compensate, skipping steps is permitted }
       property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
 
       // Status
@@ -218,7 +217,7 @@ begin
   if not Running then
     Exit(1);
 
-  Result := FStepValue / Self.FTotalStep;
+  Result := FStepValue / (FTotalStep-1);
 end;
 
 constructor TAsyncAnim.Create;
@@ -290,6 +289,10 @@ begin
       if Assigned(FOnStep) then
         FOnStep();
 
+      // Stopped
+      if FCanceled then
+        Exit;
+
       // Sleep
       if (FStepValue < FTotalStep-1) and (FSleepStep > 0) then begin
         SleepTime := FSleepStep;
@@ -346,7 +349,7 @@ end;
 
 procedure TAsyncAnim.SetDuration(const Value: single);
 begin
-  if Value*1000 > 1 then
+  if Value >= 0 then
     FDuration := Value;
 end;
 
