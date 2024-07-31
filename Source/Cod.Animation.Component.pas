@@ -42,6 +42,8 @@ uses
       // Data
       FKind: TAnimationKind;
       FDelay: single;
+      { The maximum exponent of 10 to use as a sleep interval, eg: 1 = 10ms }
+      FDelayMaxSegment: integer;
       FDuration: Single;
       { Duration values are stored as single and are
         noted in seconds, they will be multiplied by 10^3
@@ -82,6 +84,15 @@ uses
       FTotalStep: integer;
       FSleepStep: integer;
 
+      // Thread & System
+      procedure CreateThread;
+      function PropertyValid: boolean;
+
+      procedure WaitDelay;
+      procedure ExecuteAnimation; virtual;
+      procedure DoStepValue; virtual;
+      function CalculatePercent: single;
+
       // Getters
       function GetPaused: boolean;
       function GetRunning: boolean;
@@ -91,15 +102,7 @@ uses
       procedure SetSteps(const Value: integer);
       procedure SetDuration(const Value: single);
       procedure SetRunning(const Value: boolean);
-
-      // Thread & System
-      procedure CreateThread;
-      function PropertyValid: boolean;
-
-      procedure WaitDelay;
-      procedure ExecuteAnimation; virtual;
-      procedure DoStepValue; virtual;
-      function CalculatePercent: single;
+      procedure SetDelayMaxSegment(const Value: integer);
 
     published
       // Start
@@ -112,6 +115,7 @@ uses
 
       // Properties
       property Delay: single read FDelay write FDelay;
+      property DelayMaxSegment: integer read FDelayMaxSegment write SetDelayMaxSegment default 2;
       property Duration: single read FDuration write SetDuration;
 
       property Kind: TAnimationKind read FKind write FKind;
@@ -171,7 +175,7 @@ uses
       property EndValue: integer read FEndValue write FEndValue;
 
       // Status
-      property CurrentValue: integer read FCurrentValue;
+      property CurrentValue: integer read FCurrentValue write FCurrentValue;
 
     public
       // Constructors
@@ -196,7 +200,7 @@ uses
       property EndValue: real read FEndValue write FEndValue;
 
       // Status
-      property CurrentValue: real read FCurrentValue;
+      property CurrentValue: real read FCurrentValue write FCurrentValue;
 
     public
       // Constructors
@@ -233,6 +237,7 @@ begin
   FSteps := 0;
   FDuration := 2;
   FDelay := 0;
+  FDelayMaxSegment := 2;
   FInverse := false;
 
   FLatencyAdjust := false;
@@ -279,6 +284,10 @@ var
 begin
   // Sleep
   WaitDelay;
+
+  // Terminated
+  if FThread.CheckTerminated then
+    Exit;
 
   // Notify
   if Assigned(FOnStart) then
@@ -411,6 +420,12 @@ begin
     end;
 end;
 
+procedure TAnimationController.SetDelayMaxSegment(const Value: integer);
+begin
+  if Value >= 0 then
+    FDelayMaxSegment := Value;
+end;
+
 procedure TAnimationController.SetDuration(const Value: single);
 begin
   if Value >= 0 then
@@ -510,8 +525,30 @@ begin
 end;
 
 procedure TAnimationController.WaitDelay;
+var
+  I: integer;
+  Time: integer;
+  Segment: integer;
+  Count: integer;
 begin
-  Sleep( trunc(FDelay * 1000) );
+  // Calculate segment
+  Time := round(Delay * 1000);
+  for I := 2 downto 0 do begin
+    Segment := trunc(Power(10, I));
+    if Time mod Segment = 0 then
+      break;
+  end;
+
+  // Calculate repeatcount
+  Count := Time div Segment;
+
+  // Sleep for interval
+  for I := 1 to Count do begin
+    Sleep(Segment);
+
+    if FThread.CheckTerminated then
+        Exit;
+  end;
 end;
 
 { TAnimationThread }
