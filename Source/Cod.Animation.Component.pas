@@ -312,7 +312,7 @@ begin
           end);
 
       // Sleep
-      if FStepValue < FTotalStep-1 then begin
+      if (FStepValue < FTotalStep-1) and (FSleepStep > 0) then begin
         SleepTime := FSleepStep;
         if FLatencyAdjust then begin
           const CodeLatency = MillisecondsBetween(Now, StartTime);
@@ -413,7 +413,7 @@ end;
 
 procedure TAnimationController.SetDuration(const Value: single);
 begin
-  if Value*1000 > 1 then
+  if Value >= 0 then
     FDuration := Value;
 end;
 
@@ -466,12 +466,18 @@ begin
       FStepValue := 0;
       if Steps > 0 then
         begin
-          FTotalStep := Max(Steps-1, 1); // Step 0 is considered
+          FTotalStep := Max(Steps, 2); // Step 0 is considered
           FSleepStep := Max(trunc(Duration*1000 / FTotalStep), 1);
         end
       else
+      if Duration = 0 then
         begin
-          FTotalStep := round(FDuration * 100);
+          FTotalStep := 2;
+          FSleepStep := 1;
+        end
+      else
+        begin
+          FTotalStep := Max(round(FDuration * 100), 2);
           FSleepStep := 10;
         end;
 
