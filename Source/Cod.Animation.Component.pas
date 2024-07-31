@@ -15,7 +15,7 @@ unit Cod.Animation.Component;
 interface
 
 uses
-    Windows, Messages, SysUtils, Variants, Classes,
+    Windows, Messages, SysUtils, Variants, Classes, DateUtils,
     Vcl.Controls, Vcl.Dialogs, System.Math, TypInfo,
     Cod.Animation.Main, Cod.Animation.Utils;
 
@@ -40,27 +40,32 @@ uses
       ValueKinds: set of TTypeKind;
 
       // Data
+      FKind: TAnimationKind;
       FDelay: single;
       FDuration: Single;
       { Duration values are stored as single and are
         noted in seconds, they will be multiplied by 10^3
         to be used as miliseconds. }
+      FInverse: boolean;
 
-      // Properties
+      // Runtime
       FSteps: integer;
       FStatus: TAnimationStatus;
 
-      FKind: TAnimationKind;
+      // Latency
+      FLatencyAdjust: boolean;
+      FLatencyCanSkipSteps: boolean;
 
-      FStartFromCurrent: boolean;
-      FInverse: boolean;
+      // Loop
       FLoop: boolean;
       FLoopInverse: boolean;
       FDelayLoop: boolean;
 
+      // Property
+      FStartFromCurrent: boolean;
       FPropertyName: string;
 
-      // Notify Event
+      // Notify event
       FOnStart,
       FOnFinish,
       FOnLoop: TNotifyEvent;
@@ -113,6 +118,11 @@ uses
       property Inverse: boolean read FInverse write FInverse default false;
 
       property Steps: integer read FSteps write SetSteps default 0;
+
+      // compensate for the time needed to execute the code
+      property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
+      // determine wheather in order to compensate, skipping steps is permitted
+      property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
 
       property StartFromCurrent: boolean read FStartFromCurrent write FStartFromCurrent default false;
       property Loop: boolean read FLoop write FLoop default false;
@@ -202,7 +212,7 @@ begin
   if not Running then
     Exit(1);
 
-  Result := FStepValue / Self.FTotalStep;
+  Result := FStepValue / (FTotalStep-1);
 end;
 
 constructor TAnimationController.Create(AOwner: TComponent);
@@ -216,15 +226,17 @@ begin
   // Defaults
   FLoop := false;
   FLoopInverse := false;
-  FInverse := false;
   FStartFromCurrent := false;
   FStatus := TAnimationStatus.Stopped;
+
   FKind := TAnimationKind.Linear;
-
   FSteps := 0;
-
   FDuration := 2;
   FDelay := 0;
+  FInverse := false;
+
+  FLatencyAdjust := false;
+  FLatencyCanSkipSteps := true;
 end;
 
 procedure TAnimationController.CreateThread;
@@ -261,6 +273,9 @@ end;
 
 procedure TAnimationController.ExecuteAnimation;
 label StartLoop;
+var
+  StartTime: TDateTime;
+  SleepTime: cardinal;
 begin
   // Sleep
   WaitDelay;
@@ -274,14 +289,20 @@ begin
 
   // Begin work
   StartLoop:
-  while FStepValue <= FTotalStep do
+  StartTime := 0;
+  FStepValue := 0;
+  while FStepValue < FTotalStep do
     begin
       // Terminate
       if FThread.CheckTerminated then
         Exit;
 
-      // Draw
+      // Do step
       DoStepValue;
+
+      // Compensate
+      if FLatencyAdjust then
+        StartTime := Now;
 
       // Notify
       if Assigned(FOnStep) then
@@ -291,7 +312,22 @@ begin
           end);
 
       // Sleep
-      Sleep(FSleepStep);
+      if FStepValue < FTotalStep-1 then begin
+        SleepTime := FSleepStep;
+        if FLatencyAdjust then begin
+          const CodeLatency = MillisecondsBetween(Now, StartTime);
+          SleepTime := Max(0, SleepTime-CodeLatency);
+
+          if FLatencyCanSkipSteps and (CodeLatency >= FSleepStep*2) then begin
+            FStepValue := FStepValue + (CodeLatency div FSleepStep - 1);
+
+            // Ensure the final step will execute
+            if FStepValue >= FTotalStep-1 then
+              FStepValue := FTotalStep-2;
+          end;
+        end;
+        Sleep(SleepTime);
+      end;
 
       // Increase
       Inc(FStepValue);
@@ -312,8 +348,6 @@ begin
         Exit;
 
       // Reset
-      FStepValue := 0;
-
       if FLoopInverse then
         Inverse := not Inverse;
 
