@@ -17,161 +17,160 @@ unit Cod.Animation.Main;
 interface
 
 uses
-    Windows, Messages, SysUtils, Variants, Classes, Math, DateUtils,
-    Cod.Animation.Utils;
+    Windows, Messages, SysUtils, Variants, Classes, Math, DateUtils;
 
-  type
-    // Cardinals
-    TAnimationStatus = (Stopped, Running, Paused);
-    TAnimationKind = (Linear, Exponential, ReverseExpo, Random, Spring, Sinus,
-      SinusArc, Wobbly, Pulse);
+type
+  // Cardinals
+  TAnimationStatus = (Stopped, Running, Paused);
+  TAnimationKind = (Linear, Exponential, ReverseExpo, Random, Spring, Sinus,
+    SinusArc, Wobbly, Pulse);
 
-    // Async animations
-    TAsyncAnim = class
-    private
-      FFreeOnFinish: boolean;
+  // Async animations
+  TAsyncAnim = class
+  private
+    FFreeOnFinish: boolean;
 
-      // Data
-      FKind: TAnimationKind;
-      FDelay: single;
-      { The maximum exponent of 10 to use as a sleep interval, eg: 1 = 10ms }
-      FDelayMaxSegment: integer;
-      FDuration: Single;
-      FInverse: boolean;
+    // Data
+    FKind: TAnimationKind;
+    FDelay: single;
+    { The maximum exponent of 10 to use as a sleep interval, eg: 1 = 10ms }
+    FDelayMaxSegment: integer;
+    FDuration: Single;
+    FInverse: boolean;
 
-      // Runtime
-      FSteps: integer;
-      FStatus: TAnimationStatus;
-      FCanceled: boolean;
+    // Runtime
+    FSteps: integer;
+    FStatus: TAnimationStatus;
+    FCanceled: boolean;
 
-      // Latency
-      FLatencyAdjust: boolean;
-      FLatencyCanSkipSteps: boolean;
+    // Latency
+    FLatencyAdjust: boolean;
+    FLatencyCanSkipSteps: boolean;
 
-      // Notify events
-      FOnStart,
-      FOnStep,
-      FOnFinish: TProc;
+    // Notify events
+    FOnStart,
+    FOnStep,
+    FOnFinish: TProc;
 
-      // Animation Tick
-      FStepValue: integer;
-      FTotalStep: integer;
-      FSleepStep: integer;
+    // Animation Tick
+    FStepValue: integer;
+    FTotalStep: integer;
+    FSleepStep: integer;
 
-      // System
-      procedure WaitDelay;
-      procedure ExecuteAnimation; virtual;
-      procedure DoStepValue; virtual;
-      function CalculatePercent: single;
+    // System
+    procedure WaitDelay;
+    procedure ExecuteAnimation; virtual;
+    procedure DoStepValue; virtual;
+    function CalculatePercent: single;
 
-      // Getters
-      function GetPaused: boolean;
-      function GetRunning: boolean;
+    // Getters
+    function GetPaused: boolean;
+    function GetRunning: boolean;
 
-      // Setters
-      procedure SetDuration(const Value: single);
-      procedure SetSteps(const Value: integer);
-      procedure SetRunning(const Value: boolean);
-      procedure SetPaused(const Value: boolean);
-      procedure SetDelayMaxSegment(const Value: integer);
+    // Setters
+    procedure SetDuration(const Value: single);
+    procedure SetSteps(const Value: integer);
+    procedure SetRunning(const Value: boolean);
+    procedure SetPaused(const Value: boolean);
+    procedure SetDelayMaxSegment(const Value: integer);
 
-    public
-      // Start
-      procedure Start;
+  public
+    // Start
+    procedure Start;
 
-      // Task
-      procedure Stop;
+    // Task
+    procedure Stop;
 
-      // Properties
-      property FreeOnFinish: boolean read FFreeOnFinish write FFreeOnFinish;
-      property Delay: single read FDelay write FDelay;
-      property DelayMaxSegment: integer read FDelayMaxSegment write SetDelayMaxSegment default 2;
-      property Duration: single read FDuration write SetDuration;
+    // Properties
+    property FreeOnFinish: boolean read FFreeOnFinish write FFreeOnFinish;
+    property Delay: single read FDelay write FDelay;
+    property DelayMaxSegment: integer read FDelayMaxSegment write SetDelayMaxSegment default 2;
+    property Duration: single read FDuration write SetDuration;
 
-      property Kind: TAnimationKind read FKind write FKind;
-      property Inverse: boolean read FInverse write FInverse default false;
+    property Kind: TAnimationKind read FKind write FKind;
+    property Inverse: boolean read FInverse write FInverse default false;
 
-      property Steps: integer read FSteps write SetSteps;
+    property Steps: integer read FSteps write SetSteps;
 
-      { compensate for the time needed to execute the code }
-      property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
-      { determine wheather in order to compensate, skipping steps is permitted }
-      property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
+    { compensate for the time needed to execute the code }
+    property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
+    { determine wheather in order to compensate, skipping steps is permitted }
+    property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
 
-      // Status
-      property Percent: single read CalculatePercent;
+    // Status
+    property Percent: single read CalculatePercent;
 
-      // Code Properties
-      property Running: boolean read GetRunning write SetRunning;
-      property Paused: boolean read GetPaused write SetPaused;
-      property Status: TAnimationStatus read FStatus;
+    // Code Properties
+    property Running: boolean read GetRunning write SetRunning;
+    property Paused: boolean read GetPaused write SetPaused;
+    property Status: TAnimationStatus read FStatus;
 
-      // Notify
-      property OnStart: TProc read FOnStart write FOnStart;
-      property OnFinish: TProc read FOnFinish write FOnFinish;
-      property OnStep: TProc read FOnStep write FOnStep;
+    // Notify
+    property OnStart: TProc read FOnStart write FOnStart;
+    property OnFinish: TProc read FOnFinish write FOnFinish;
+    property OnStep: TProc read FOnStep write FOnStep;
 
-      // Constructors
-      constructor Create;
-      destructor Destroy; override;
-    end;
+    // Constructors
+    constructor Create;
+    destructor Destroy; override;
+  end;
 
-    TAsyncIntAnim = class(TAsyncAnim)
-    type TValueCall = reference to procedure(Value: integer);
-    private
-      // Values
-      FStartValue: integer;
-      FEndValue: integer;
+  TAsyncIntAnim = class(TAsyncAnim)
+  type TValueCall = reference to procedure(Value: integer);
+  private
+    // Values
+    FStartValue: integer;
+    FEndValue: integer;
 
-      FDelta: integer;
-      FCurrentValue: integer;
+    FDelta: integer;
+    FCurrentValue: integer;
 
-      FOnValue: TValueCall;
+    FOnValue: TValueCall;
 
-      procedure ExecuteAnimation; override;
-      procedure DoStepValue; override;
+    procedure ExecuteAnimation; override;
+    procedure DoStepValue; override;
 
-    public
-      // Properties
-      property StartValue: integer read FStartValue write FStartValue;
-      property EndValue: integer read FEndValue write FEndValue;
+  public
+    // Properties
+    property StartValue: integer read FStartValue write FStartValue;
+    property EndValue: integer read FEndValue write FEndValue;
 
-      // Status
-      property CurrentValue: integer read FCurrentValue write FCurrentValue;
+    // Status
+    property CurrentValue: integer read FCurrentValue write FCurrentValue;
 
-      // Special event
-      property OnValue: TValueCall read FOnValue write FOnValue;
-    end;
+    // Special event
+    property OnValue: TValueCall read FOnValue write FOnValue;
+  end;
 
-    TAsyncFloatAnim = class(TAsyncAnim)
-    type TValueCall = reference to procedure(Value: real);
-    private
-      // Values
-      FStartValue: real;
-      FEndValue: real;
+  TAsyncFloatAnim = class(TAsyncAnim)
+  type TValueCall = reference to procedure(Value: real);
+  private
+    // Values
+    FStartValue: real;
+    FEndValue: real;
 
-      FDelta: real;
-      FCurrentValue: real;
+    FDelta: real;
+    FCurrentValue: real;
 
-      FOnValue: TValueCall;
+    FOnValue: TValueCall;
 
-      procedure ExecuteAnimation; override;
-      procedure DoStepValue; override;
+    procedure ExecuteAnimation; override;
+    procedure DoStepValue; override;
 
-    public
-      // Properties
-      property StartValue: real read FStartValue write FStartValue;
-      property EndValue: real read FEndValue write FEndValue;
+  public
+    // Properties
+    property StartValue: real read FStartValue write FStartValue;
+    property EndValue: real read FEndValue write FEndValue;
 
-      // Status
-      property CurrentValue: real read FCurrentValue write FCurrentValue;
+    // Status
+    property CurrentValue: real read FCurrentValue write FCurrentValue;
 
-      // Special event
-      property OnValue: TValueCall read FOnValue write FOnValue;
-    end;
+    // Special event
+    property OnValue: TValueCall read FOnValue write FOnValue;
+  end;
 
-  // Equations
-  function CalculateAnimationValue(Kind: TAnimationKind; Step, StepCount: integer; Delta: real): real;
+// Equations
+function CalculateAnimationValue(Kind: TAnimationKind; Step, StepCount: integer; Delta: real): real;
 
 implementation
 

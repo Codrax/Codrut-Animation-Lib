@@ -15,196 +15,196 @@ unit Cod.Animation.Component;
 interface
 
 uses
-    Windows, Messages, SysUtils, Variants, Classes, DateUtils,
-    Vcl.Controls, Vcl.Dialogs, System.Math, TypInfo,
-    Cod.Animation.Main, Cod.Animation.Utils;
+  Windows, Messages, SysUtils, Variants, Classes, DateUtils,
+  Vcl.Controls, Vcl.Dialogs, System.Math, TypInfo,
+  Cod.Animation.Main, Cod.Animation.Utils;
 
-  type
-    // Notify Event
-    TAniStepEvent = procedure(Sender: TObject; Step, TotalSteps: integer) of object;
+type
+  // Notify Event
+  TAniStepEvent = procedure(Sender: TObject; Step, TotalSteps: integer) of object;
 
-    // Classes
-    TAnimationController = class;
+  // Classes
+  TAnimationController = class;
 
-    TAnimationThread = class(TThread)
-      private
-        FAnimation: TAnimationController;
-      public
-        procedure Execute; override;
-        constructor Create(AAnim: TAnimationController);
-    end;
-
-    TAnimationController = class(TComponent)
+  TAnimationThread = class(TThread)
     private
-      // Anim Const
-      ValueKinds: set of TTypeKind;
-
-      // Data
-      FKind: TAnimationKind;
-      FDelay: single;
-      { The maximum exponent of 10 to use as a sleep interval, eg: 1 = 10ms }
-      FDelayMaxSegment: integer;
-      FDuration: Single;
-      { Duration values are stored as single and are
-        noted in seconds, they will be multiplied by 10^3
-        to be used as miliseconds. }
-      FInverse: boolean;
-
-      // Runtime
-      FSteps: integer;
-      FStatus: TAnimationStatus;
-      ComponentBased: boolean;
-
-      // Latency
-      FLatencyAdjust: boolean;
-      FLatencyCanSkipSteps: boolean;
-
-      // Loop
-      FLoop: boolean;
-      FLoopInverse: boolean;
-      FLoopDelay: boolean;
-
-      // Property
-      FComponent: TComponent;
-      FStartFromCurrent: boolean;
-      FPropertyName: string;
-
-      // Notify event
-      FOnStart,
-      FOnFinish,
-      FOnLoop: TNotifyEvent;
-      FOnStep: TAniStepEvent;
-
-      // Thread
-      FThread: TAnimationThread;
-
-      // Animation Tick
-      FStepValue: integer;
-      FTotalStep: integer;
-      FSleepStep: integer;
-
-      // Thread & System
-      procedure CreateThread;
-      function PropertyValid: boolean;
-
-      procedure WaitDelay;
-      procedure ExecuteAnimation; virtual;
-      procedure DoStepValue; virtual;
-      function CalculatePercent: single;
-
-      // Getters
-      function GetPaused: boolean;
-      function GetRunning: boolean;
-
-      // Setters
-      procedure SetPaused(const Value: boolean);
-      procedure SetSteps(const Value: integer);
-      procedure SetDuration(const Value: single);
-      procedure SetRunning(const Value: boolean);
-      procedure SetDelayMaxSegment(const Value: integer);
-
-    published
-      // Start
-      procedure Start;
-      procedure StartInverse;
-
-      // Task
-      procedure Stop;
-      procedure Restart;
-
-      // Properties
-      property Delay: single read FDelay write FDelay;
-      property DelayMaxSegment: integer read FDelayMaxSegment write SetDelayMaxSegment default 2;
-      property Duration: single read FDuration write SetDuration;
-
-      property Kind: TAnimationKind read FKind write FKind;
-      property Inverse: boolean read FInverse write FInverse default false;
-
-      property Steps: integer read FSteps write SetSteps default 0;
-
-      { compensate for the time needed to execute the code }
-      property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
-      { determine wheather in order to compensate, skipping steps is permitted }
-      property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
-
-      property StartFromCurrent: boolean read FStartFromCurrent write FStartFromCurrent default false;
-      property Loop: boolean read FLoop write FLoop default false;
-      property LoopInverse: boolean read FLoopInverse write FLoopInverse default false;
-      property LoopDelay: boolean read FLoopDelay write FLoopDelay default false;
-
-      property PropertyName: string read FPropertyName write FPropertyName;
-
-      property Component: TComponent read FComponent write FComponent;
-
-      // Status
-      property Percent: single read CalculatePercent;
-
-      // Notify
-      property OnStart: TNotifyEvent read FOnStart write FOnStart;
-      property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
-      property OnLoop: TNotifyEvent read FOnLoop write FOnLoop;
-      property OnStep: TAniStepEvent read FOnStep write FOnStep;
-
+      FAnimation: TAnimationController;
     public
-      // Code Properties
-      property Running: boolean read GetRunning write SetRunning;
-      property Paused: boolean read GetPaused write SetPaused;
-      property Status: TAnimationStatus read FStatus;
+      procedure Execute; override;
+      constructor Create(AAnim: TAnimationController);
+  end;
 
-      // Constructors
-      constructor Create(AOwner: TComponent); override;
-      destructor Destroy; override;
-    end;
+  TAnimationController = class(TComponent)
+  private
+    // Anim Const
+    ValueKinds: set of TTypeKind;
 
-    TIntAnim = class(TAnimationController)
-    private
-      // Values
-      FStartValue: integer;
-      FEndValue: integer;
+    // Data
+    FKind: TAnimationKind;
+    FDelay: single;
+    { The maximum exponent of 10 to use as a sleep interval, eg: 1 = 10ms }
+    FDelayMaxSegment: integer;
+    FDuration: Single;
+    { Duration values are stored as single and are
+      noted in seconds, they will be multiplied by 10^3
+      to be used as miliseconds. }
+    FInverse: boolean;
 
-      FDelta: integer;
-      FCurrentValue: integer;
+    // Runtime
+    FSteps: integer;
+    FStatus: TAnimationStatus;
+    ComponentBased: boolean;
 
-      procedure ExecuteAnimation; override;
-      procedure DoStepValue; override;
+    // Latency
+    FLatencyAdjust: boolean;
+    FLatencyCanSkipSteps: boolean;
 
-    published
-      // Properties
-      property StartValue: integer read FStartValue write FStartValue;
-      property EndValue: integer read FEndValue write FEndValue;
+    // Loop
+    FLoop: boolean;
+    FLoopInverse: boolean;
+    FLoopDelay: boolean;
 
-      // Status
-      property CurrentValue: integer read FCurrentValue write FCurrentValue;
+    // Property
+    FComponent: TComponent;
+    FStartFromCurrent: boolean;
+    FPropertyName: string;
 
-    public
-      // Constructors
-      constructor Create(AOwner: TComponent); override;
-    end;
+    // Notify event
+    FOnStart,
+    FOnFinish,
+    FOnLoop: TNotifyEvent;
+    FOnStep: TAniStepEvent;
 
-    TFloatAnim = class(TAnimationController)
-    private
-      // Values
-      FStartValue: real;
-      FEndValue: real;
+    // Thread
+    FThread: TAnimationThread;
 
-      FDelta: real;
-      FCurrentValue: real;
+    // Animation Tick
+    FStepValue: integer;
+    FTotalStep: integer;
+    FSleepStep: integer;
 
-      procedure ExecuteAnimation; override;
-      procedure DoStepValue; override;
+    // Thread & System
+    procedure CreateThread;
+    function PropertyValid: boolean;
 
-    published
-      // Properties
-      property StartValue: real read FStartValue write FStartValue;
-      property EndValue: real read FEndValue write FEndValue;
+    procedure WaitDelay;
+    procedure ExecuteAnimation; virtual;
+    procedure DoStepValue; virtual;
+    function CalculatePercent: single;
 
-      // Status
-      property CurrentValue: real read FCurrentValue write FCurrentValue;
+    // Getters
+    function GetPaused: boolean;
+    function GetRunning: boolean;
 
-    public
-      // Constructors
-      constructor Create(AOwner: TComponent); override;
-    end;
+    // Setters
+    procedure SetPaused(const Value: boolean);
+    procedure SetSteps(const Value: integer);
+    procedure SetDuration(const Value: single);
+    procedure SetRunning(const Value: boolean);
+    procedure SetDelayMaxSegment(const Value: integer);
+
+  published
+    // Start
+    procedure Start;
+    procedure StartInverse;
+
+    // Task
+    procedure Stop;
+    procedure Restart;
+
+    // Properties
+    property Delay: single read FDelay write FDelay;
+    property DelayMaxSegment: integer read FDelayMaxSegment write SetDelayMaxSegment default 2;
+    property Duration: single read FDuration write SetDuration;
+
+    property Kind: TAnimationKind read FKind write FKind;
+    property Inverse: boolean read FInverse write FInverse default false;
+
+    property Steps: integer read FSteps write SetSteps default 0;
+
+    { compensate for the time needed to execute the code }
+    property LatencyAdjustments: boolean read FLatencyAdjust write FLatencyAdjust default false;
+    { determine wheather in order to compensate, skipping steps is permitted }
+    property LatencyCanSkipSteps: boolean read FLatencyCanSkipSteps write FLatencyCanSkipSteps default true;
+
+    property StartFromCurrent: boolean read FStartFromCurrent write FStartFromCurrent default false;
+    property Loop: boolean read FLoop write FLoop default false;
+    property LoopInverse: boolean read FLoopInverse write FLoopInverse default false;
+    property LoopDelay: boolean read FLoopDelay write FLoopDelay default false;
+
+    property PropertyName: string read FPropertyName write FPropertyName;
+
+    property Component: TComponent read FComponent write FComponent;
+
+    // Status
+    property Percent: single read CalculatePercent;
+
+    // Notify
+    property OnStart: TNotifyEvent read FOnStart write FOnStart;
+    property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
+    property OnLoop: TNotifyEvent read FOnLoop write FOnLoop;
+    property OnStep: TAniStepEvent read FOnStep write FOnStep;
+
+  public
+    // Code Properties
+    property Running: boolean read GetRunning write SetRunning;
+    property Paused: boolean read GetPaused write SetPaused;
+    property Status: TAnimationStatus read FStatus;
+
+    // Constructors
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+  TIntAnim = class(TAnimationController)
+  private
+    // Values
+    FStartValue: integer;
+    FEndValue: integer;
+
+    FDelta: integer;
+    FCurrentValue: integer;
+
+    procedure ExecuteAnimation; override;
+    procedure DoStepValue; override;
+
+  published
+    // Properties
+    property StartValue: integer read FStartValue write FStartValue;
+    property EndValue: integer read FEndValue write FEndValue;
+
+    // Status
+    property CurrentValue: integer read FCurrentValue write FCurrentValue;
+
+  public
+    // Constructors
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TFloatAnim = class(TAnimationController)
+  private
+    // Values
+    FStartValue: real;
+    FEndValue: real;
+
+    FDelta: real;
+    FCurrentValue: real;
+
+    procedure ExecuteAnimation; override;
+    procedure DoStepValue; override;
+
+  published
+    // Properties
+    property StartValue: real read FStartValue write FStartValue;
+    property EndValue: real read FEndValue write FEndValue;
+
+    // Status
+    property CurrentValue: real read FCurrentValue write FCurrentValue;
+
+  public
+    // Constructors
+    constructor Create(AOwner: TComponent); override;
+  end;
 
 implementation
 
@@ -417,10 +417,9 @@ end;
 procedure TAnimationController.Restart;
 begin
   if FStatus in [TAnimationStatus.Running, TAnimationStatus.Paused] then
-    begin
-      Stop;
-      Start;
-    end;
+    Stop;
+
+  Start;
 end;
 
 procedure TAnimationController.SetDelayMaxSegment(const Value: integer);
