@@ -67,7 +67,7 @@ type
     // Property
     FComponent: TComponent;
     FStartFromCurrent: boolean;
-    FPropertyName: string;
+    FPropertyName: TAnimationPropertyName;
 
     // Notify event
     FOnStart,
@@ -132,7 +132,7 @@ type
     property LoopInverse: boolean read FLoopInverse write FLoopInverse default false;
     property LoopDelay: boolean read FLoopDelay write FLoopDelay default false;
 
-    property PropertyName: string read FPropertyName write FPropertyName;
+    property PropertyName: TAnimationPropertyName read FPropertyName write FPropertyName;
 
     property Component: TComponent read FComponent write FComponent;
 

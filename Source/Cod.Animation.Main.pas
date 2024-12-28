@@ -29,6 +29,7 @@ type
   TAsyncAnim = class
   private
     FFreeOnFinish: boolean;
+    FTag: integer;
 
     // Data
     FKind: TAnimationKind;
@@ -73,6 +74,7 @@ type
     procedure SetRunning(const Value: boolean);
     procedure SetPaused(const Value: boolean);
     procedure SetDelayMaxSegment(const Value: integer);
+    function CalculatePercentAnimated: single;
 
   public
     // Start
@@ -82,6 +84,7 @@ type
     procedure Stop;
 
     // Properties
+    property Tag: integer read FTag write FTag;
     property FreeOnFinish: boolean read FFreeOnFinish write FFreeOnFinish;
     property Delay: single read FDelay write FDelay;
     property DelayMaxSegment: integer read FDelayMaxSegment write SetDelayMaxSegment default 2;
@@ -99,6 +102,7 @@ type
 
     // Status
     property Percent: single read CalculatePercent;
+    property PercentAnimated: single read CalculatePercentAnimated;
 
     // Code Properties
     property Running: boolean read GetRunning write SetRunning;
@@ -219,10 +223,19 @@ begin
   Result := FStepValue / (FTotalStep-1);
 end;
 
+function TAsyncAnim.CalculatePercentAnimated: single;
+begin
+  if not Running then
+    Exit(1);
+
+  Result := CalculateAnimationValue(FKind, FStepValue, FTotalStep, 1);
+end;
+
 constructor TAsyncAnim.Create;
 begin
   // Defaults
   FFreeOnFinish := false;
+  FTag := 0;
 
   FStatus := TAnimationStatus.Stopped;
 
@@ -289,8 +302,10 @@ begin
         FOnStep();
 
       // Stopped
-      if FCanceled then
+      if FCanceled then begin
+        FStatus := TAnimationStatus.Stopped;
         Exit;
+      end;
 
       // Sleep
       if (FStepValue < FTotalStep-1) and (FSleepStep > 0) then begin
@@ -314,12 +329,12 @@ begin
       Inc(FStepValue);
     end;
 
+  // Done
+  FStatus := TAnimationStatus.Stopped;
+
   // Stopped
   if FCanceled then
     Exit;
-
-  // Done
-  FStatus := TAnimationStatus.Stopped;
 
   // Notify
   if Assigned(FOnFinish) then
@@ -404,6 +419,7 @@ begin
         end;
 
       // Status
+      FCanceled := false;
       FStatus := TAnimationStatus.Running;
 
       // Thread
